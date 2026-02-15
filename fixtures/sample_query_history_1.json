@@ -1,0 +1,47 @@
+[
+  {
+    "QUERY_ID": "01abc-0001",
+    "QUERY_TEXT": "CREATE OR REPLACE TABLE analytics.stg_orders AS SELECT id, customer_id, amount, created_at FROM raw.orders WHERE created_at >= '2024-01-01'",
+    "WAREHOUSE_NAME": "TRANSFORM_WH",
+    "BYTES_SCANNED": 524288000,
+    "CREDITS_USED": 1.5,
+    "EXECUTION_TIME": 12000,
+    "START_TIME": "2024-01-15T08:00:00"
+  },
+  {
+    "QUERY_ID": "01abc-0002",
+    "QUERY_TEXT": "CREATE OR REPLACE TABLE analytics.fct_orders AS SELECT o.id, o.amount, c.segment FROM analytics.stg_orders o JOIN analytics.dim_customers c ON o.customer_id = c.id",
+    "WAREHOUSE_NAME": "TRANSFORM_WH",
+    "BYTES_SCANNED": 1073741824,
+    "CREDITS_USED": 4.2,
+    "EXECUTION_TIME": 45000,
+    "START_TIME": "2024-01-15T09:00:00"
+  },
+  {
+    "QUERY_ID": "01abc-0003",
+    "QUERY_TEXT": "SELECT segment, SUM(amount) AS total FROM analytics.fct_orders GROUP BY segment",
+    "WAREHOUSE_NAME": "ANALYTICS_WH",
+    "BYTES_SCANNED": 209715200,
+    "CREDITS_USED": 0.8,
+    "EXECUTION_TIME": 5000,
+    "START_TIME": "2024-01-15T10:00:00"
+  },
+  {
+    "QUERY_ID": "01abc-0004",
+    "QUERY_TEXT": "CREATE OR REPLACE TABLE analytics.dim_customers AS SELECT id, name, segment FROM raw.customers",
+    "WAREHOUSE_NAME": "TRANSFORM_WH",
+    "BYTES_SCANNED": 104857600,
+    "CREDITS_USED": 0.5,
+    "EXECUTION_TIME": 3000,
+    "START_TIME": "2024-01-15T07:30:00"
+  },
+  {
+    "QUERY_ID": "01abc-0005",
+    "QUERY_TEXT": "INSERT INTO analytics.stg_orders SELECT id, customer_id, amount, created_at FROM raw.orders WHERE created_at >= '2024-02-01'",
+    "WAREHOUSE_NAME": "TRANSFORM_WH",
+    "BYTES_SCANNED": 262144000,
+    "CREDITS_USED": 0.9,
+    "EXECUTION_TIME": 8000,
+    "START_TIME": "2024-02-01T08:00:00"
+  }
+]

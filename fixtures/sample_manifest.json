@@ -1,0 +1,38 @@
+{
+  "nodes": {
+    "model.project.stg_orders": {
+      "resource_type": "model",
+      "name": "stg_orders",
+      "schema": "analytics",
+      "config": {"materialized": "table"},
+      "depends_on": {"nodes": ["source.project.raw.orders"]},
+      "raw_sql": "SELECT id, customer_id, amount, created_at FROM {{ source('raw', 'orders') }}"
+    },
+    "model.project.dim_customers": {
+      "resource_type": "model",
+      "name": "dim_customers",
+      "schema": "analytics",
+      "config": {"materialized": "table"},
+      "depends_on": {"nodes": ["source.project.raw.customers"]},
+      "raw_sql": "SELECT id, name, segment FROM {{ source('raw', 'customers') }}"
+    },
+    "model.project.fct_orders": {
+      "resource_type": "model",
+      "name": "fct_orders",
+      "schema": "analytics",
+      "config": {"materialized": "table"},
+      "depends_on": {"nodes": ["model.project.stg_orders", "model.project.dim_customers"]},
+      "raw_sql": "SELECT o.id, o.amount, c.segment FROM {{ ref('stg_orders') }} o JOIN {{ ref('dim_customers') }} c ON o.customer_id = c.id"
+    },
+    "source.project.raw.orders": {
+      "resource_type": "source",
+      "name": "orders",
+      "schema": "raw"
+    },
+    "source.project.raw.customers": {
+      "resource_type": "source",
+      "name": "customers",
+      "schema": "raw"
+    }
+  }
+}
